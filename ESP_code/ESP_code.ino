@@ -32,7 +32,13 @@ const int resolution = 8;
 
 //PIR
 unsigned long alarm_duration = 10000;
-unsigned long last_alarm = alarm_duration;
+unsigned long last_intrupt = alarm_duration;
+bool alarm_activation=false;
+bool curr_alarm=false;
+bool alarm_activation_published=true;
+bool alarm_deactivation_published=true;
+
+
 
 
 
@@ -41,14 +47,18 @@ PubSubClient client(espClient);
 
 
 void IRAM_ATTR detectsMovement() {
-  int state = digitalRead(pirPin);
-  if (state == HIGH) {
-    digitalWrite(2,HIGH);
+  
    
-    last_alarm=millis();
+  int state = digitalRead(23);
+  if (state == HIGH) {
+    alarm_activation_published=false;
+    digitalWrite(2,HIGH);
+    curr_alarm=true;
+    last_intrupt=millis();
   } else {
+    alarm_deactivation_published=false;
     digitalWrite(2,LOW);
-    
+    curr_alarm=false;
   }
 }
 
@@ -114,6 +124,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
     led_controle(msg);
   }
+  else if (top == "alarm_on"){
+    if (msg=="1"){
+      alarm_activation=true;
+    }
+    else{
+      alarm_activation=false;
+    }
+  }
  
   else if (top == "red"){
     slidebar(25,msg);
@@ -134,6 +152,7 @@ void reconnect() {
     if (client.connect("esp32client")) {
       Serial.println("MQTT connected!");
       client.subscribe("onnoff");
+      client.subscribe("alarm_on");
 
       
 
@@ -187,14 +206,59 @@ void loop(){
 
    unsigned long currentMillis = millis();
 
-   if (currentMillis-last_alarm<=alarm_duration){
+    curr_alarm=curr_alarm&&alarm_activation;
+    
+   
+
+    if (curr_alarm){
+
+      if (!alarm_activation_published){
+        digitalWrite(33,HIGH);
+        client.publish("alarm","high");
+        alarm_activation_published=true;
+       
+      }
+       
+
+    }
+    else{
+
+      if (!alarm_deactivation_published){
+        
+        value--;
+        ledcWrite(13, value);
+        if (currentMillis-last_intrupt>alarm_duration){
+          digitalWrite(33,LOW);
+          client.publish("alarm","low");
+          alarm_deactivation_published=true;
+
+        }
+      }
+
+    }
+
+
+
+   /*if (currentMillis-last_alarm<=alarm_duration){
+    if (!curr_alarm){
+      curr_alarm=true;
+      digitalWrite(33,HIGH);
+      client.publish("alarm","high");
+    }
+      
       
    }
    else{
-
+    if (curr_alarm){
+      curr_alarm=true;
+      digitalWrite(33,LOW);
+      client.publish("alarm","low");
+    }
+    
    }
+   */
 
-  if (currentMillis - lastDHTTime >= DHTInterval) {
+  if (alarm_activation &&(currentMillis - lastDHTTime >= DHTInterval)) {
     lastDHTTime = currentMillis;
 
     float hum = dht.readHumidity();
