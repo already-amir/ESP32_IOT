@@ -31,36 +31,31 @@ const int freq = 5000;
 const int resolution = 8;
 
 //PIR
-unsigned long alarm_duration = 10000;
-unsigned long last_intrupt = alarm_duration;
+volatile bool motionDetected = false;
+bool alarmActive = false;
+unsigned long alarmStartTime = 0;
+const unsigned long alarmDuration = 5000; 
+unsigned long lastToneChange = 0;
+const unsigned long toneChangeInterval = 20;
+int currentFreq = 1000;
+int freqStep = 50;
 bool alarm_activation=false;
-bool curr_alarm=false;
-bool alarm_activation_published=true;
-bool alarm_deactivation_published=true;
-
-
-
-
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 
-void IRAM_ATTR detectsMovement() {
+
+void IRAM_ATTR detectMotion() {
   
-   
-  int state = digitalRead(23);
-  if (state == HIGH) {
-    alarm_activation_published=false;
-    digitalWrite(2,HIGH);
-    curr_alarm=true;
-    last_intrupt=millis();
-  } else {
-    alarm_deactivation_published=false;
-    digitalWrite(2,LOW);
-    curr_alarm=false;
-  }
+  alarmActive = true;
+  alarmStartTime = millis();
+  currentFreq = 1000;
+  freqStep = 50;
+  
 }
+
+
 
 void led_controle(String msg){
 
@@ -179,7 +174,7 @@ void setup(){
   ledcAttach(26, freq, resolution);
   ledcAttach(27, freq, resolution);
   
-  attachInterrupt(digitalPinToInterrupt(23), detectsMovement, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(23), detectMotion, RISING);
 
 
 
@@ -202,63 +197,34 @@ void loop(){
   }
   client.loop();
 
+  if (motionDetected ) {
+    client.publish("hum", hum1);
+  }
 
+  if (alarmActive && alarm_activation) {
+    if (millis() - alarmStartTime < alarmDuration) {
+      if (millis() - lastToneChange > toneChangeInterval) {
+        lastToneChange = millis();
 
-   unsigned long currentMillis = millis();
-
-    curr_alarm=curr_alarm&&alarm_activation;
-    
-   
-
-    if (curr_alarm){
-
-      if (!alarm_activation_published){
-        digitalWrite(33,HIGH);
-        client.publish("alarm","high");
-        alarm_activation_published=true;
-       
-      }
-       
-
-    }
-    else{
-
-      if (!alarm_deactivation_published){
-        
-        value--;
-        ledcWrite(13, value);
-        if (currentMillis-last_intrupt>alarm_duration){
-          digitalWrite(33,LOW);
-          client.publish("alarm","low");
-          alarm_deactivation_published=true;
-
+        tone(13, currentFreq);
+        currentFreq += freqStep;
+        if (currentFreq >= 2000 || currentFreq <= 1000) {
+          freqStep = -freqStep; // تغییر جهت
         }
       }
-
+    } else {
+      noTone(13);
+      alarmActive = false;
     }
+  }
+  else{
+    noTone(13);
+  }
 
+  unsigned long currentMillis = millis();
 
-
-   /*if (currentMillis-last_alarm<=alarm_duration){
-    if (!curr_alarm){
-      curr_alarm=true;
-      digitalWrite(33,HIGH);
-      client.publish("alarm","high");
-    }
-      
-      
-   }
-   else{
-    if (curr_alarm){
-      curr_alarm=true;
-      digitalWrite(33,LOW);
-      client.publish("alarm","low");
-    }
-    
-   }
-   */
-
-  if (alarm_activation &&(currentMillis - lastDHTTime >= DHTInterval)) {
+  
+  if ( currentMillis - lastDHTTime >= DHTInterval) {
     lastDHTTime = currentMillis;
 
     float hum = dht.readHumidity();
