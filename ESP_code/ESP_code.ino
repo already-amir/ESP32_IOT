@@ -40,6 +40,7 @@ const unsigned long toneChangeInterval = 20;
 int currentFreq = 1000;
 int freqStep = 50;
 bool alarm_activation=false;
+bool last_mot=false;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -48,10 +49,17 @@ PubSubClient client(espClient);
 
 void IRAM_ATTR detectMotion() {
   
-  alarmActive = true;
-  alarmStartTime = millis();
-  currentFreq = 1000;
-  freqStep = 50;
+  int state=digitalRead(23);
+  if (state==HIGH){
+    digitalWrite(2,HIGH);
+    alarmStartTime = millis();
+    motionDetected=true;
+    
+  }
+  else{
+    digitalWrite(2,LOW);
+    motionDetected=false;
+  }
   
 }
 
@@ -174,7 +182,7 @@ void setup(){
   ledcAttach(26, freq, resolution);
   ledcAttach(27, freq, resolution);
   
-  attachInterrupt(digitalPinToInterrupt(23), detectMotion, RISING);
+  attachInterrupt(digitalPinToInterrupt(23), detectMotion, CHANGE);
 
 
 
@@ -198,28 +206,51 @@ void loop(){
   client.loop();
 
   if (motionDetected ) {
-    client.publish("hum", hum1);
-  }
+    
+    if (!last_mot==motionDetected){
+      client.publish("alarm", "high");
+      alarmActive = true;
+      currentFreq = 1000;
+      freqStep = 50;
 
-  if (alarmActive && alarm_activation) {
-    if (millis() - alarmStartTime < alarmDuration) {
-      if (millis() - lastToneChange > toneChangeInterval) {
-        lastToneChange = millis();
-
-        tone(13, currentFreq);
-        currentFreq += freqStep;
-        if (currentFreq >= 2000 || currentFreq <= 1000) {
-          freqStep = -freqStep; // تغییر جهت
-        }
-      }
-    } else {
-      noTone(13);
-      alarmActive = false;
     }
+    
   }
   else{
+    if (!last_mot==motionDetected){
+       client.publish("alarm", "low");
+    
+
+    }
+   
+
+  }
+  last_mot=motionDetected;
+
+  if (!alarm_activation){
+    alarmActive=false;
     noTone(13);
   }
+
+  if (alarmActive) {
+    
+    if (millis() - lastToneChange > toneChangeInterval) {
+      lastToneChange = millis();
+
+      tone(13, currentFreq);
+      currentFreq += freqStep;
+      if (currentFreq >= 2000 || currentFreq <= 1000) {
+        freqStep = -freqStep; 
+      }
+      
+    }
+
+    if (millis() - alarmStartTime > alarmDuration){
+      alarmActive = false;
+      noTone(13);
+    }
+  }
+  
 
   unsigned long currentMillis = millis();
 
