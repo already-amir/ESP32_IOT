@@ -24,7 +24,7 @@ A **compact, practical smart home system** built using an **ESP32**, MQTT, and I
 - **IR Receiver Module** (GPIO 14)
 - **RGB LED with PWM** (GPIO 25 - Red, 26 - Green, 27 - Blue)
 - **Buzzer for alarm** (GPIO 13)
-- **Individual LEDs** (GPIO 12, 13, 32, 33)
+- **Individual LEDs** (GPIO 12, 32, 33)
 - **Local Mosquitto MQTT Server**
 
 ---
@@ -41,7 +41,7 @@ A **compact, practical smart home system** built using an **ESP32**, MQTT, and I
 
 1️⃣ **Clone this repository**:
 ```bash
-git clone https://github.com/yourusername/ESP32-IoT-SmartHome.git
+git clone https://github.com/already-amir/ESP32_IOT.git
 ```
 2️⃣ Install Dependencies:
 
@@ -51,40 +51,52 @@ git clone https://github.com/yourusername/ESP32-IoT-SmartHome.git
 
         PubSubClient
 
-        DHT
+        DHT (DHT kxn by Adafruit)
 
-        IRremoteESP8266
+        IRremote
 
 3️⃣ Configure WiFi and MQTT in main.ino:
-
+```cpp
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
 
 const char* mqtt_server = "YOUR_MQTT_BROKER_IP";
 uint16_t mqtt_port = 1883;
-
+```
 4️⃣ Flash the code to your ESP32.
 
 5️⃣ Run Mosquitto locally:
-
+```bash
 mosquitto -v
-
+```
 Or install using:
 
     Windows: Mosquitto Installer
 
     Linux: sudo apt install mosquitto mosquitto-clients
 
-🛰️ MQTT Topics
-Topic	Description	Payload Examples
-onnoff	Control LEDs	1_1 (on), 1_0 (off)
-alarm_on	Enable/disable alarm system	1 (on), 0 (off)
-red	Red PWM brightness (0-255)	128
-green	Green PWM brightness (0-255)	200
-blue	Blue PWM brightness (0-255)	255
-temp	Temperature readings from ESP32	24.50
-hum	Humidity readings from ESP32	55.00
-alarm	Motion detection status	high, low
+## 🛰️ MQTT Topics
+
+| Topic      | Description                  | Payload Examples        |
+|------------|------------------------------|-------------------------|
+| `onnoff`   | Control LEDs                 | `1_1` (on), `1_0` (off) |
+| `alarm_on` | Enable/disable alarm system  | `1` (on), `0` (off)     |
+| `red`      | Red PWM brightness (0-255)  | `128`                   |
+| `green`    | Green PWM brightness (0-255)| `200`                   |
+| `blue`     | Blue PWM brightness (0-255) | `255`                   |
+| `temp`     | Temperature from ESP32       | `24.50`                 |
+| `hum`      | Humidity from ESP32          | `55.00`                 |
+| `alarm`    | Motion detection status      | `high`, `low`           |
+
+
+
+
+
+
+///////
+
+
+
 🖥️ IR Remote Control Mappings
 
 Use an IR remote to control:
