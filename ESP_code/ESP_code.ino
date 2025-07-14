@@ -2,6 +2,7 @@
 #include <PubSubClient.h>
 #include <Arduino.h>
 #include <DHT.h>
+#include <IRremote.hpp>
 #define n 10
 
 
@@ -184,6 +185,7 @@ void setup(){
   
   attachInterrupt(digitalPinToInterrupt(23), detectMotion, CHANGE);
 
+  IrReceiver.begin(14, ENABLE_LED_FEEDBACK); 
 
 
   WiFi.begin(ssid,password);
@@ -204,6 +206,69 @@ void loop(){
     reconnect();
   }
   client.loop();
+
+  if (IrReceiver.decode()) {
+    
+   
+    Serial.println(IrReceiver.decodedIRData.command, HEX);
+    uint8_t command = IrReceiver.decodedIRData.command;
+    switch (command) {
+      case 0x16: 
+        digitalWrite(12, HIGH);
+        break;
+      case 0xC:  
+        digitalWrite(12, LOW);
+        break;
+
+
+      case 0x19: 
+        digitalWrite(33, HIGH);
+        break;
+      case 0x18: 
+        digitalWrite(33, LOW);
+        break;
+
+
+      case 0xD: 
+        digitalWrite(32, HIGH);
+        break;
+      case 0x5E: 
+        digitalWrite(32, LOW);
+        break;
+
+      
+      case 0x8: 
+        digitalWrite(2, HIGH);
+        break;
+      case 0x42: 
+        digitalWrite(2, LOW);
+        break;
+
+      case 0x1C: 
+        digitalWrite(2, HIGH);
+        break;
+      case 0x52: 
+        digitalWrite(2, LOW);
+        break;
+
+      case 0x7: 
+        alarm_activation=false;
+        break;
+      case 0x15: 
+        alarm_activation=true;
+        break;
+
+      
+
+      
+      default:
+        break;
+    }
+
+    IrReceiver.resume(); 
+  }
+
+
 
   if (motionDetected ) {
     

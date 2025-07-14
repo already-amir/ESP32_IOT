@@ -1,22 +1,23 @@
+#include <IRremote.h>
+
+#define IR_RECEIVE_PIN 14
 
 void setup() {
- 
-
-  attachInterrupt(digitalPinToInterrupt(pirPin), detectMotion, RISING);
-
-  // اینجا MQTT و WiFi خودت را ستاپ کن
+  Serial.begin(115200);
+  IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
+  Serial.println("IR Receiver ready");
 }
 
 void loop() {
-  // اینجا MQTT.loop() و سایر دستوراتی که نیاز داری را بنویس
+  if (IrReceiver.decode()) {
+    //Serial.print("IR Code: 0x");
+    Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
 
-  if (motionDetected) {
-    motionDetected = false;
-    alarmActive = true;
-    alarmStartTime = millis();
-    currentFreq = 1000;
-    freqStep = 50;
+    // مثال: کنترل LED
+    if (IrReceiver.decodedIRData.decodedRawData == 0xFFA25D) {
+      digitalWrite(33, HIGH);
+    }
+
+    IrReceiver.resume();
   }
-
-  
 }

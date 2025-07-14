@@ -1,10 +1,10 @@
 #include <IRremote.hpp>
 
-const int IR_RECEIVE_PIN = 13;  // پایه اتصال سنسور مادون قرمز
+const int IR_RECEIVE_PIN = 14;  // پایه اتصال سنسور مادون قرمز
 
 void setup() {
   Serial.begin(115200);
-  IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);  // شروع دریافت IR
+  IrReceiver.begin(14, ENABLE_LED_FEEDBACK);  // شروع دریافت IR
   Serial.println("منتظر دریافت سیگنال مادون قرمز...");
   pinMode(2, OUTPUT);
 }
@@ -16,9 +16,9 @@ void loop() {
     Serial.println(IrReceiver.decodedIRData.command, HEX);
     uint8_t command = IrReceiver.decodedIRData.command;
     switch (command) {
-      case 0xC:  // دکمه A
+      case 0x16:  // دکمه A
         digitalWrite(2, HIGH);
-        Serial.println("LED روشن شد");
+        
         break;
       case 0x16:  // دکمه B
         digitalWrite(2, LOW);
