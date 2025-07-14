@@ -42,7 +42,7 @@ A **compact, practical smart home system** built using an **ESP32**, MQTT, and I
 1️⃣ **Clone this repository**:
 ```bash
 git clone https://github.com/yourusername/ESP32-IoT-SmartHome.git
-
+```
 2️⃣ Install Dependencies:
 
     Arduino IDE or PlatformIO
