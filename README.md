@@ -31,9 +31,30 @@ A **compact, practical smart home system** built using an **ESP32**, MQTT, and I
 
 ## 🛠️ Wiring Diagram
 
-> 📌 Replace this with your Fritzing diagram.
+   
 
 ![Wiring Diagram](docs/wiring_diagram.png)
+
+
+> ⚠️ **Note:**  
+> Ignore any pin numbers shown in example diagrams if they differ from your actual setup.  
+> Use the table below for the **correct ESP32 pin assignments** for this project.
+
+| Component                       | ESP32 Pin      | Notes               |
+|---------------------------------|----------------|----------------------|
+| **DHT11 (Temperature & Humidity)** | GPIO 4         | Digital data pin     |
+| **PIR Motion Sensor**           | GPIO 23        | Digital OUT          |
+| **IR Receiver**                 | GPIO 14        | Digital OUT          |
+| **Buzzer (Alarm)**              | GPIO 13        | Uses `tone()` function |
+| **LED 1**                       | GPIO 12        | General output LED   |
+| **LED 2**                       | GPIO 13        | (Shares with Buzzer) |
+| **LED 3**                       | GPIO 32        | General output LED   |
+| **LED 4**                       | GPIO 33        | General output LED   |
+| **RGB LED - Red**               | GPIO 25 (PWM)  | Controlled via MQTT  |
+| **RGB LED - Green**             | GPIO 26 (PWM)  | Controlled via MQTT  |
+| **RGB LED - Blue**              | GPIO 27 (PWM)  | Controlled via MQTT  |
+
+
 
 ---
 
@@ -88,28 +109,44 @@ Or install using:
 | `hum`      | Humidity from ESP32          | `55.00`                 |
 | `alarm`    | Motion detection status      | `high`, `low`           |
 
+## 📱 Mobile App Control
+
+You can **control and monitor your ESP32 IoT Smart Home system directly from your smartphone** using a free MQTT client app.
+
+### ✅ Recommended App
+
+We recommend using:
+
+- **MQTT Dashboard (Android)**  
+  [Download from Google Play](https://play.google.com/store/apps/details?id=at.tripwire.mqtt.client)
+
+---
+
+### ⚙️ Configuration File
+
+To simplify setup, you can **import the provided configuration file into the app to auto-generate dashboards for controlling LEDs, RGB, and monitoring temperature, humidity, and alarm status**.
+
+**Download Configuration File:**
+
+[📥 MQTT Dashboard Config File](docs/IoTMQTTPanel.json)
+
+> ⚠️ After importing the configuration:
+> - Replace the **MQTT broker IP address** with your local server IP (e.g., `192.168.0.xx`).
+> - Ensure your phone is connected to the **same WiFi network as your ESP32**.
 
 
-
-
-
-///////
-
-
-
-🖥️ IR Remote Control Mappings
-
-Use an IR remote to control:
-
-    Turn LEDs on/off
-
-    Enable/disable alarm
-
-    Control additional functions directly without MQTT
 
 🖼️ Project Images
 
-    📌 Replace with real images of your setup.
+<p align="center">
+  <img src="docs/p1.jpg" width="90%">
+</p>
+
+<p align="center">
+  <img src="docs/p2.jpg" width="45%"/>
+  <img src="docs/p3.jpg" width="45%"/>
+</p>
+
 
 ✅ Future Improvements
 
@@ -126,7 +163,8 @@ Use an IR remote to control:
 📄 License
 
 This project is licensed under the MIT License.
-🤝 Contributing
+
+### 🤝 Contributing
 
 Pull requests are welcome! For significant changes, please open an issue first to discuss what you would like to change.
 ✨ Acknowledgments
@@ -141,6 +179,6 @@ Pull requests are welcome! For significant changes, please open an issue first t
 
 🔗 Contact
 
-[Your Name]
+[Amir]
 GitHub: yourusername
-Email: [youremail@example.com]
+Email: [already.amirm@gmail.com]
