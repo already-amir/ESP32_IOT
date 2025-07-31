@@ -36,9 +36,6 @@ A **compact, practical smart home system** built using an **ESP32**, MQTT, and I
 ![Wiring Diagram](docs/wiring_diagram.png)
 
 
-> ⚠️ **Note:**  
-> Ignore any pin numbers shown in example diagrams if they differ from your actual setup.  
-> Use the table below for the **correct ESP32 pin assignments** for this project.
 
 | Component                       | ESP32 Pin      | Notes               |
 |---------------------------------|----------------|----------------------|
