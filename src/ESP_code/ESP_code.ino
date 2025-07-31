@@ -13,11 +13,11 @@ int inp[n]={23};
 int out[n]={2,13,12,5,33,32,13};
 
 //modem
-const char* ssid = "dlink";
-const char* password = "43453036";
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
 
 //mqtt blocker
-const char* mqtt_server = "192.168.0.10";
+const char* mqtt_server = "YOUR_MQTT_BROKER_IP";
 uint16_t mqtt_port= 1883;
 
 // DHT
